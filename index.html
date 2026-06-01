@@ -6,522 +6,591 @@
 <title>Dashboard อนุมัติถอน</title>
 
 <style>
-:root{
-    --bg:#0f172a;
-    --card:#ffffff;
-    --muted:#64748b;
-    --text:#0f172a;
-    --line:#e2e8f0;
-    --primary:#ef4444;
-    --primary-dark:#dc2626;
-    --green:#16a34a;
-    --yellow:#d97706;
-    --red:#dc2626;
-    --green-bg:#dcfce7;
-    --yellow-bg:#fef3c7;
-    --red-bg:#fee2e2;
+*{
+    box-sizing:border-box;
 }
 
-*{ box-sizing:border-box; }
-
 body{
-    font-family: Inter, "Segoe UI", Tahoma, sans-serif;
-    min-height:100vh;
+    font-family:Tahoma, Arial, sans-serif;
     margin:0;
-    padding:28px;
-    color:var(--text);
-    background:
-        radial-gradient(circle at top left, rgba(239,68,68,.28), transparent 34%),
-        radial-gradient(circle at top right, rgba(59,130,246,.22), transparent 32%),
-        linear-gradient(135deg, #020617, #111827 55%, #1e293b);
+    min-height:100vh;
+    background:linear-gradient(135deg,#0f172a,#1e293b,#334155);
+    color:#0f172a;
+    padding:24px;
 }
 
 .container{
-    max-width:1050px;
+    max-width:1080px;
     margin:auto;
+    background:#ffffff;
+    padding:28px;
+    border-radius:24px;
+    box-shadow:0 24px 80px rgba(0,0,0,.25);
 }
 
 .header{
     display:flex;
     justify-content:space-between;
-    align-items:flex-end;
-    gap:18px;
-    margin-bottom:18px;
-    color:white;
+    align-items:center;
+    gap:16px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
 }
 
-.header h1{
+.title h1{
     margin:0;
-    font-size:clamp(28px,4vw,42px);
-    letter-spacing:-.04em;
+    font-size:30px;
+    letter-spacing:-.5px;
 }
 
-.header p{
-    margin:8px 0 0;
-    color:#cbd5e1;
+.title p{
+    margin:6px 0 0;
+    color:#64748b;
+    font-size:14px;
 }
 
-.badge{
-    padding:10px 14px;
-    border:1px solid rgba(255,255,255,.18);
+.user-badge{
+    background:#0f172a;
+    color:white;
+    padding:12px 18px;
     border-radius:999px;
-    background:rgba(255,255,255,.08);
-    backdrop-filter: blur(12px);
-    color:#e2e8f0;
-    white-space:nowrap;
+    font-weight:bold;
+    letter-spacing:.5px;
+    box-shadow:0 8px 24px rgba(15,23,42,.25);
 }
 
-.panel{
-    background:rgba(255,255,255,.96);
-    border:1px solid rgba(255,255,255,.35);
-    border-radius:28px;
-    box-shadow:0 24px 70px rgba(0,0,0,.32);
-    overflow:hidden;
-}
-
-.form-card{
-    padding:26px;
+.section-title{
+    margin:24px 0 12px;
+    font-size:16px;
+    font-weight:bold;
+    color:#334155;
 }
 
 .grid{
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-columns:repeat(2,1fr);
     gap:16px;
 }
 
 .field{
-    position:relative;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    padding:14px;
+    border-radius:16px;
+    transition:.2s;
+}
+
+.field:focus-within{
+    border-color:#2563eb;
+    background:#ffffff;
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
 }
 
 label{
     display:block;
-    margin:0 0 8px;
-    font-size:14px;
-    font-weight:700;
+    font-weight:bold;
+    margin-bottom:8px;
     color:#334155;
+    font-size:14px;
 }
 
 input{
     width:100%;
-    height:48px;
     padding:12px 14px;
-    border:1px solid var(--line);
-    border-radius:14px;
-    background:#f8fafc;
-    color:#0f172a;
+    border:1px solid #cbd5e1;
+    border-radius:12px;
     font-size:16px;
     outline:none;
-    transition:.18s ease;
+    background:white;
 }
 
-input:focus{
-    border-color:#ef4444;
-    background:#fff;
-    box-shadow:0 0 0 4px rgba(239,68,68,.13);
+input[readonly]{
+    background:#e2e8f0;
+    color:#475569;
+    font-weight:bold;
+    cursor:not-allowed;
+}
+
+.hint{
+    margin-top:6px;
+    color:#94a3b8;
+    font-size:12px;
 }
 
 .actions{
     display:grid;
-    grid-template-columns:1fr auto;
-    gap:12px;
-    margin-top:20px;
+    grid-template-columns:2fr 1fr;
+    gap:14px;
+    margin-top:24px;
 }
 
 button{
+    padding:16px;
     border:none;
     border-radius:16px;
-    font-size:17px;
-    font-weight:800;
+    font-size:18px;
+    font-weight:bold;
     cursor:pointer;
-    transition:.18s ease;
+    transition:.2s;
 }
 
-.primary-btn{
-    width:100%;
-    padding:16px 18px;
-    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-    color:white;
-    box-shadow:0 12px 24px rgba(239,68,68,.24);
-}
-
-.primary-btn:hover{
+button:hover{
     transform:translateY(-1px);
-    box-shadow:0 16px 28px rgba(239,68,68,.30);
 }
 
-.secondary-btn{
-    padding:16px 18px;
-    background:#f1f5f9;
+.calculate-btn{
+    background:linear-gradient(135deg,#dc2626,#991b1b);
+    color:white;
+    box-shadow:0 12px 28px rgba(220,38,38,.28);
+}
+
+.clear-btn{
+    background:#e2e8f0;
     color:#334155;
 }
 
-.secondary-btn:hover{ background:#e2e8f0; }
-
 .result{
+    margin-top:24px;
+    padding:24px;
+    border-radius:22px;
     display:none;
-    margin-top:22px;
-    border-radius:24px;
-    border:1px solid var(--line);
-    overflow:hidden;
-}
-
-.result-top{
-    display:grid;
-    grid-template-columns:1fr auto;
-    gap:14px;
-    align-items:center;
-    padding:22px;
+    border:1px solid transparent;
 }
 
 .result h2{
-    margin:0;
+    margin-top:0;
+}
+
+.result-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin:16px 0;
+}
+
+.stat{
+    background:rgba(255,255,255,.65);
+    padding:14px;
+    border-radius:14px;
+}
+
+.stat b{
+    display:block;
+    color:#475569;
+    font-size:13px;
+    margin-bottom:6px;
+}
+
+.stat span{
     font-size:20px;
+    font-weight:bold;
+}
+
+.approve{
+    background:#dcfce7;
+    border-color:#86efac;
+}
+
+.review{
+    background:#fef3c7;
+    border-color:#fcd34d;
+}
+
+.reject{
+    background:#fee2e2;
+    border-color:#fca5a5;
 }
 
 .big{
-    margin:6px 0 0;
-    font-size:clamp(26px,4vw,38px);
-    font-weight:900;
-    letter-spacing:-.03em;
-}
-
-.score-card{
-    min-width:110px;
-    padding:14px 16px;
-    border-radius:18px;
-    background:rgba(255,255,255,.66);
-    text-align:center;
-}
-
-.score-card span{
-    display:block;
-    font-size:30px;
-    font-weight:900;
-}
-
-.meta{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:12px;
-    padding:0 22px 22px;
-}
-
-.meta-box{
-    padding:14px;
-    border-radius:16px;
-    background:rgba(255,255,255,.66);
-}
-
-.meta-box b{
-    display:block;
-    margin-bottom:4px;
-    color:#475569;
-    font-size:13px;
-}
-
-.reason-wrap{
-    padding:20px 22px 22px;
-    border-top:1px solid rgba(15,23,42,.08);
-    background:rgba(255,255,255,.45);
-}
-
-.reason-wrap p{
-    margin:0 0 8px;
-    font-weight:800;
+    font-size:34px;
+    font-weight:bold;
+    margin:12px 0;
 }
 
 ul{
-    margin:0;
-    padding-left:20px;
+    margin-bottom:0;
 }
 
-li{ margin:6px 0; }
+li{
+    margin:6px 0;
+}
 
-.approve{ background:var(--green-bg); }
-.review{ background:var(--yellow-bg); }
-.reject{ background:var(--red-bg); }
+@media(max-width:760px){
+    body{
+        padding:12px;
+    }
 
-.approve .big{ color:var(--green); }
-.review .big{ color:var(--yellow); }
-.reject .big{ color:var(--red); }
+    .container{
+        padding:18px;
+        border-radius:18px;
+    }
 
-@media (max-width:720px){
-    body{ padding:16px; }
-    .header{ display:block; }
-    .badge{ display:inline-block; margin-top:14px; }
-    .grid,.actions,.meta,.result-top{ grid-template-columns:1fr; }
-    .form-card{ padding:18px; }
+    .grid,
+    .actions,
+    .result-grid{
+        grid-template-columns:1fr;
+    }
+
+    .title h1{
+        font-size:24px;
+    }
 }
 </style>
 </head>
 
 <body>
+
 <div class="container">
+
     <div class="header">
-        <div>
+        <div class="title">
             <h1>📊 Dashboard อนุมัติถอน</h1>
-            <p>กรอกข้อมูลตามลำดับ กด Enter เพื่อไปช่องถัดไป และช่องสุดท้ายกด Enter เพื่อคำนวณ</p>
+            <p>กรอกข้อมูลแล้วกด Enter เพื่อไปช่องถัดไป / ช่องสุดท้ายกด Enter เพื่อคำนวณ</p>
         </div>
-        <div class="badge">Withdrawal Review</div>
+        <div class="user-badge">USER : FRT</div>
     </div>
 
-    <div class="panel">
-        <div class="form-card">
-            <div class="grid">
-                <div class="field">
-                    <label>Username</label>
-                    <input id="username" autocomplete="off" placeholder="เช่น user123">
-                </div>
+    <div class="section-title">ข้อมูลผู้ใช้</div>
 
-                <div class="field">
-                    <label>ยอดฝากล่าสุด</label>
-                    <input id="lastDeposit" type="number" inputmode="decimal" placeholder="0">
-                </div>
+    <div class="grid">
+        <div class="field">
+            <label>Username</label>
+            <input id="username" value="frt" readonly>
+            <div class="hint">ล็อกค่าไว้ ไม่ต้องกรอก</div>
+        </div>
 
-                <div class="field">
-                    <label>ยอดถอนที่ต้องการ</label>
-                    <input id="withdraw" type="number" inputmode="decimal" placeholder="0">
-                </div>
-
-                <div class="field">
-                    <label>ยอดฝากรวมวันนี้</label>
-                    <input id="todayDeposit" type="number" inputmode="decimal" placeholder="0">
-                </div>
-
-                <div class="field">
-                    <label>ยอดถอนรวมวันนี้</label>
-                    <input id="todayWithdraw" type="number" inputmode="decimal" placeholder="0">
-                </div>
-
-                <div class="field">
-                    <label>จำนวนบิลฝากวันนี้</label>
-                    <input id="todayBills" type="number" inputmode="numeric" placeholder="0">
-                </div>
-
-                <div class="field">
-                    <label>ยอดฝากรวมเดือนนี้</label>
-                    <input id="monthDeposit" type="number" inputmode="decimal" placeholder="0">
-                </div>
-
-                <div class="field">
-                    <label>ยอดถอนรวมเดือนนี้</label>
-                    <input id="monthWithdraw" type="number" inputmode="decimal" placeholder="0">
-                </div>
-
-                <div class="field">
-                    <label>ยอดฝากรวมเดือนก่อน</label>
-                    <input id="prevDeposit" type="number" inputmode="decimal" placeholder="0">
-                </div>
-
-                <div class="field">
-                    <label>ยอดถอนรวมเดือนก่อน</label>
-                    <input id="prevWithdraw" type="number" inputmode="decimal" placeholder="0">
-                </div>
-
-                <div class="field">
-                    <label>อายุยูส (วัน)</label>
-                    <input id="userAge" type="number" inputmode="numeric" placeholder="0">
-                </div>
-            </div>
-
-            <div class="actions">
-                <button class="primary-btn" onclick="calculate()">คำนวณผล</button>
-                <button class="secondary-btn" type="button" onclick="clearForm()">ล้างข้อมูล</button>
-            </div>
-
-            <div id="result" class="result">
-                <div class="result-top">
-                    <div>
-                        <h2>ผลการพิจารณา</h2>
-                        <p class="big" id="decision"></p>
-                    </div>
-                    <div class="score-card">
-                        คะแนนรวม
-                        <span id="score"></span>
-                    </div>
-                </div>
-
-                <div class="meta">
-                    <div class="meta-box">
-                        <b>Username</b>
-                        <span id="showUsername">-</span>
-                    </div>
-                    <div class="meta-box">
-                        <b>สถานะลูกค้า</b>
-                        <span id="customerType"></span>
-                    </div>
-                </div>
-
-                <div class="reason-wrap">
-                    <p>เหตุผล</p>
-                    <ul id="reason"></ul>
-                </div>
-            </div>
+        <div class="field">
+            <label>วันฝากแรกของยูส</label>
+            <input id="firstDepositDate" type="date" placeholder="YYYY-MM-DD" data-enter>
+            <div class="hint">กรอกเป็น yyyy-mm-dd เช่น 2026-05-25</div>
         </div>
     </div>
+
+    <div class="section-title">ข้อมูลยอดล่าสุด / วันนี้</div>
+
+    <div class="grid">
+        <div class="field">
+            <label>ยอดฝากล่าสุด</label>
+            <input id="lastDeposit" type="number" min="0" data-enter>
+        </div>
+
+        <div class="field">
+            <label>ยอดถอนที่ต้องการ</label>
+            <input id="withdraw" type="number" min="0" data-enter>
+        </div>
+
+        <div class="field">
+            <label>เครดิตคงเหลือปัจจุบัน</label>
+            <input id="currentCredit" type="number" min="0" data-enter>
+            <div class="hint">ใช้เช็กว่าถอนได้จริงหรือเสี่ยงเกินไป</div>
+        </div>
+
+        <div class="field">
+            <label>ยอดฝากรวมวันนี้</label>
+            <input id="todayDeposit" type="number" min="0" data-enter>
+        </div>
+
+        <div class="field">
+            <label>ยอดถอนรวมวันนี้</label>
+            <input id="todayWithdraw" type="number" min="0" data-enter>
+        </div>
+
+        <div class="field">
+            <label>จำนวนบิลฝากวันนี้</label>
+            <input id="todayBills" type="number" min="0" data-enter>
+        </div>
+    </div>
+
+    <div class="section-title">ข้อมูลรายเดือน</div>
+
+    <div class="grid">
+        <div class="field">
+            <label>ยอดฝากรวมเดือนนี้</label>
+            <input id="monthDeposit" type="number" min="0" data-enter>
+        </div>
+
+        <div class="field">
+            <label>ยอดถอนรวมเดือนนี้</label>
+            <input id="monthWithdraw" type="number" min="0" data-enter>
+        </div>
+
+        <div class="field">
+            <label>ยอดฝากรวมเดือนก่อน</label>
+            <input id="prevDeposit" type="number" min="0" data-enter>
+        </div>
+
+        <div class="field">
+            <label>ยอดถอนรวมเดือนก่อน</label>
+            <input id="prevWithdraw" type="number" min="0" data-enter>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="calculate-btn" onclick="calculate()">คำนวณผล</button>
+        <button class="clear-btn" onclick="clearForm()">ล้างข้อมูล</button>
+    </div>
+
+    <div id="result" class="result">
+        <h2>ผลการพิจารณา</h2>
+
+        <p class="big" id="decision"></p>
+
+        <div class="result-grid">
+            <div class="stat">
+                <b>สถานะลูกค้า</b>
+                <span id="customerType"></span>
+            </div>
+            <div class="stat">
+                <b>คะแนนรวม</b>
+                <span id="score"></span>
+            </div>
+            <div class="stat">
+                <b>อายุยูส</b>
+                <span><span id="userAgeText"></span> วัน</span>
+            </div>
+            <div class="stat">
+                <b>เครดิตหลังถอน</b>
+                <span id="creditAfterWithdraw"></span>
+            </div>
+        </div>
+
+        <p><b>เหตุผล :</b></p>
+        <ul id="reason"></ul>
+    </div>
+
 </div>
 
 <script>
-const formInputs = Array.from(document.querySelectorAll('input'));
+function money(value){
+    return Number(value || 0).toLocaleString('th-TH');
+}
 
-formInputs.forEach((input, index) => {
-    input.addEventListener('keydown', function(e){
-        if(e.key === 'Enter'){
-            e.preventDefault();
-
-            const nextInput = formInputs[index + 1];
-            if(nextInput){
-                nextInput.focus();
-                nextInput.select();
-            }else{
-                calculate();
-            }
-        }
-    });
-});
-
-function valueOf(id){
+function getNumber(id){
     return Number(document.getElementById(id).value || 0);
 }
 
+function getUserAgeFromFirstDeposit(){
+    let firstDepositDate = document.getElementById('firstDepositDate').value;
+
+    if(!firstDepositDate){
+        return 0;
+    }
+
+    let firstDate = new Date(firstDepositDate + 'T00:00:00');
+    let today = new Date();
+    today.setHours(0,0,0,0);
+
+    let diff = Math.floor((today - firstDate) / (1000 * 60 * 60 * 24));
+
+    if(diff < 0){
+        return 0;
+    }
+
+    return diff;
+}
+
 function calculate(){
-    let username = document.getElementById('username').value.trim();
-    let lastDeposit = valueOf('lastDeposit');
-    let withdraw = valueOf('withdraw');
-    let todayDeposit = valueOf('todayDeposit');
-    let todayWithdraw = valueOf('todayWithdraw');
-    let todayBills = valueOf('todayBills');
-    let monthDeposit = valueOf('monthDeposit');
-    let monthWithdraw = valueOf('monthWithdraw');
-    let prevDeposit = valueOf('prevDeposit');
-    let prevWithdraw = valueOf('prevWithdraw');
-    let userAge = valueOf('userAge');
+    let lastDeposit = getNumber('lastDeposit');
+    let withdraw = getNumber('withdraw');
+    let currentCredit = getNumber('currentCredit');
+    let todayDeposit = getNumber('todayDeposit');
+    let todayWithdraw = getNumber('todayWithdraw');
+    let todayBills = getNumber('todayBills');
+    let monthDeposit = getNumber('monthDeposit');
+    let monthWithdraw = getNumber('monthWithdraw');
+    let prevDeposit = getNumber('prevDeposit');
+    let prevWithdraw = getNumber('prevWithdraw');
+    let userAge = getUserAgeFromFirstDeposit();
 
     let score = 0;
     let reasons = [];
+    let forceReject = false;
 
-    let customerType = prevDeposit >= 35000 ? "ลูกค้าประจำ" : "ลูกค้าทั่วไป";
+    let customerType = prevDeposit >= 35000 ? 'ลูกค้าประจำ' : 'ลูกค้าทั่วไป';
 
     if(prevDeposit >= 35000){
         score += 30;
-        reasons.push("ยอดฝากเดือนก่อนเกิน 35,000");
+        reasons.push('ยอดฝากเดือนก่อนเกิน 35,000');
     }
 
     if(lastDeposit < 100){
         score -= 40;
-        reasons.push("ยอดฝากล่าสุดต่ำกว่า 100");
+        reasons.push('ยอดฝากล่าสุดต่ำกว่า 100');
     }
     else if(lastDeposit < 200){
         score -= 20;
-        reasons.push("ยอดฝากล่าสุดต่ำกว่า 200");
+        reasons.push('ยอดฝากล่าสุดต่ำกว่า 200');
     }
     else if(lastDeposit >= 500){
         score += 10;
-        reasons.push("ยอดฝากล่าสุดตั้งแต่ 500 ขึ้นไป");
+        reasons.push('ยอดฝากล่าสุดตั้งแต่ 500 ขึ้นไป');
     }
 
     if(todayDeposit < 500){
         score -= 20;
-        reasons.push("ยอดฝากรวมวันนี้ต่ำกว่า 500");
+        reasons.push('ยอดฝากรวมวันนี้ต่ำกว่า 500');
     }
     else if(todayDeposit >= 10000){
         score += 20;
-        reasons.push("ยอดฝากรวมวันนี้ตั้งแต่ 10,000 ขึ้นไป");
+        reasons.push('ยอดฝากรวมวันนี้ตั้งแต่ 10,000 ขึ้นไป');
     }
     else if(todayDeposit >= 3000){
         score += 10;
-        reasons.push("ยอดฝากรวมวันนี้ตั้งแต่ 3,000 ขึ้นไป");
+        reasons.push('ยอดฝากรวมวันนี้ตั้งแต่ 3,000 ขึ้นไป');
     }
 
     if(todayBills == 1){
         score -= 10;
-        reasons.push("วันนี้มีบิลฝากเพียง 1 บิล");
+        reasons.push('วันนี้มีบิลฝากแค่ 1 บิล');
     }
     else if(todayBills >= 4){
         score += 10;
-        reasons.push("วันนี้มีบิลฝากตั้งแต่ 4 บิลขึ้นไป");
+        reasons.push('วันนี้มีบิลฝากตั้งแต่ 4 บิลขึ้นไป');
     }
 
+    let profitToday = todayDeposit - todayWithdraw;
     let profitMonth = monthDeposit - monthWithdraw;
+    let profitPrev = prevDeposit - prevWithdraw;
+    let creditAfter = currentCredit - withdraw;
 
     if(profitMonth > 0){
         score += 20;
-        reasons.push("ยอดฝากเดือนนี้มากกว่ายอดถอนเดือนนี้");
+        reasons.push('เดือนนี้ยอดฝากมากกว่ายอดถอน');
     }
     else{
         score -= 20;
-        reasons.push("ยอดถอนเดือนนี้มากกว่าหรือเท่ากับยอดฝากเดือนนี้");
+        reasons.push('เดือนนี้ยอดถอนมากกว่าหรือเท่ากับยอดฝาก');
     }
-
-    let profitPrev = prevDeposit - prevWithdraw;
 
     if(profitPrev > 20000){
         score += 20;
-        reasons.push("เดือนก่อนมียอดฝากสุทธิมากกว่า 20,000");
+        reasons.push('เดือนก่อนเว็บได้กำไรจากยูสมากกว่า 20,000');
     }
     else if(profitPrev > 5000){
         score += 10;
-        reasons.push("เดือนก่อนมียอดฝากสุทธิมากกว่า 5,000");
+        reasons.push('เดือนก่อนเว็บได้กำไรจากยูสมากกว่า 5,000');
     }
     else if(profitPrev < -5000){
         score -= 10;
-        reasons.push("เดือนก่อนยอดถอนมากกว่ายอดฝากเกิน 5,000");
+        reasons.push('เดือนก่อนยูสถอนมากกว่าฝากเกิน 5,000');
     }
 
     if(userAge < 7){
         score -= 20;
-        reasons.push("อายุยูสน้อยกว่า 7 วัน");
+        reasons.push('อายุยูสน้อยกว่า 7 วัน');
     }
     else if(userAge >= 30){
         score += 10;
-        reasons.push("อายุยูสตั้งแต่ 30 วันขึ้นไป");
+        reasons.push('อายุยูสตั้งแต่ 30 วันขึ้นไป');
     }
 
-    let decision = "";
-    let resultClass = "";
+    if(withdraw > 0 && currentCredit <= 0){
+        score -= 20;
+        reasons.push('ยังไม่ได้กรอกเครดิตคงเหลือ หรือเครดิตเป็น 0');
+    }
+    else if(withdraw > currentCredit){
+        forceReject = true;
+        reasons.push('เครดิตคงเหลือน้อยกว่ายอดถอนที่ต้องการ');
+    }
+    else if(currentCredit > 0){
+        let withdrawRatio = withdraw / currentCredit;
 
-    if(lastDeposit < 100 && withdraw >= 5000 && monthDeposit < 1000 && prevDeposit < 35000){
-        decision = "❌ ไม่อนุมัติถอน";
-        resultClass = "reject";
-        reasons.push("เข้าเงื่อนไข Red Flag");
+        if(withdrawRatio >= 0.9){
+            score -= 20;
+            reasons.push('ยอดถอนเกิน 90% ของเครดิตคงเหลือ');
+        }
+        else if(withdrawRatio >= 0.7){
+            score -= 10;
+            reasons.push('ยอดถอนเกิน 70% ของเครดิตคงเหลือ');
+        }
+        else if(creditAfter >= 500){
+            score += 10;
+            reasons.push('หลังถอนแล้วยังเหลือเครดิตตั้งแต่ 500 ขึ้นไป');
+        }
+    }
+
+    if(
+        lastDeposit < 100 &&
+        withdraw >= 5000 &&
+        monthDeposit < 1000 &&
+        prevDeposit < 35000
+    ){
+        forceReject = true;
+        reasons.push('เข้าเงื่อนไข Red Flag: ฝากล่าสุดต่ำ ยอดถอนสูง และประวัติฝากต่ำ');
+    }
+
+    let decision = '';
+    let resultClass = '';
+
+    if(forceReject){
+        decision = '❌ ไม่อนุมัติถอน';
+        resultClass = 'reject';
     }
     else if(score >= 30){
-        decision = "✅ อนุมัติถอน";
-        resultClass = "approve";
+        decision = '✅ อนุมัติถอน';
+        resultClass = 'approve';
     }
     else if(score >= 10){
-        decision = "⚠️ ส่งตรวจสอบ";
-        resultClass = "review";
+        decision = '⚠️ ส่งตรวจสอบ';
+        resultClass = 'review';
     }
     else{
-        decision = "❌ ไม่อนุมัติถอน";
-        resultClass = "reject";
-    }
-
-    if(reasons.length === 0){
-        reasons.push("ไม่มีเงื่อนไขเด่นเพิ่มเติม");
+        decision = '❌ ไม่อนุมัติถอน';
+        resultClass = 'reject';
     }
 
     let result = document.getElementById('result');
-    result.className = "result " + resultClass;
-    result.style.display = "block";
+    result.className = 'result ' + resultClass;
+    result.style.display = 'block';
 
-    document.getElementById('showUsername').innerText = username || "-";
     document.getElementById('customerType').innerText = customerType;
     document.getElementById('score').innerText = score;
     document.getElementById('decision').innerText = decision;
-    document.getElementById('reason').innerHTML = reasons.map(x => "<li>" + x + "</li>").join("");
+    document.getElementById('userAgeText').innerText = userAge;
+    document.getElementById('creditAfterWithdraw').innerText = money(creditAfter);
+
+    document.getElementById('reason').innerHTML = reasons.map(function(text){
+        return '<li>' + text + '</li>';
+    }).join('');
 
     result.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function clearForm(){
-    formInputs.forEach(input => input.value = '');
+    let inputs = document.querySelectorAll('input:not([readonly])');
+    inputs.forEach(function(input){
+        input.value = '';
+    });
+
     document.getElementById('result').style.display = 'none';
-    formInputs[0].focus();
+    document.getElementById('firstDepositDate').focus();
 }
 
-window.addEventListener('load', () => formInputs[0].focus());
+function setupEnterToNextInput(){
+    let inputs = Array.from(document.querySelectorAll('input[data-enter]'));
+
+    inputs.forEach(function(input, index){
+        input.addEventListener('keydown', function(event){
+            if(event.key === 'Enter'){
+                event.preventDefault();
+
+                let nextInput = inputs[index + 1];
+
+                if(nextInput){
+                    nextInput.focus();
+                    nextInput.select();
+                }
+                else{
+                    calculate();
+                }
+            }
+        });
+    });
+}
+
+setupEnterToNextInput();
+document.getElementById('firstDepositDate').focus();
 </script>
+
 </body>
 </html>
