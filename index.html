@@ -97,6 +97,34 @@ h1{
     font-size:13px;
     white-space:nowrap;
 }
+
+.clock-box{
+    border:1px solid rgba(244,214,117,.38);
+    background:linear-gradient(135deg,rgba(212,175,55,.20),rgba(0,0,0,.35));
+    color:var(--text);
+    padding:10px 14px;
+    border-radius:16px;
+    min-width:220px;
+    text-align:right;
+    box-shadow:0 0 24px rgba(212,175,55,.10);
+}
+.clock-box small{
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    margin-bottom:4px;
+}
+.clock-box b{
+    display:block;
+    color:var(--gold-2);
+    font-size:16px;
+}
+.clock-box span{
+    display:block;
+    color:#e5e7eb;
+    font-size:12px;
+    margin-top:2px;
+}
 .layout{
     display:grid;
     grid-template-columns:minmax(760px,1.6fr) minmax(420px,.9fr);
@@ -314,6 +342,11 @@ li{margin:8px 0;line-height:1.45}
             </div>
         </div>
         <div class="header-badges">
+            <div class="clock-box">
+                <small>วันที่และเวลา Real-time</small>
+                <b id="liveDate">-</b>
+                <span id="liveTime">-</span>
+            </div>
             <div class="badge">Enter = ช่องถัดไป</div>
             <div class="badge">User: frt + เลข</div>
             <div class="badge">Rules Updated</div>
@@ -383,7 +416,7 @@ li{margin:8px 0;line-height:1.45}
 
                 <div class="section">
                     <div class="section-title"><span class="dot"></span>ข้อมูลเดือนนี้</div>
-                    <div class="grid two">
+                    <div class="grid">
                         <div class="field">
                             <label>ยอดฝากรวมเดือนนี้</label>
                             <input id="monthDeposit" class="nav-input" type="number" min="0" placeholder="0" />
@@ -391,6 +424,10 @@ li{margin:8px 0;line-height:1.45}
                         <div class="field">
                             <label>ยอดถอนรวมเดือนนี้ (ก่อนรายการนี้)</label>
                             <input id="monthWithdraw" class="nav-input" type="number" min="0" placeholder="0" />
+                        </div>
+                        <div class="field">
+                            <label>จำนวนวันฝากเดือนนี้</label>
+                            <input id="monthDepositDays" class="nav-input" type="number" min="0" placeholder="เช่น 3" />
                         </div>
                     </div>
                 </div>
@@ -430,6 +467,7 @@ li{margin:8px 0;line-height:1.45}
                         <div class="metric"><small>ประเภทลูกค้า</small><b id="customerType">-</b></div>
                         <div class="metric"><small>คะแนนรวม</small><b id="score">-</b></div>
                         <div class="metric"><small>อายุยูส</small><b id="userAgeText">-</b></div>
+                        <div class="metric"><small>ความถี่ฝากเดือนนี้</small><b id="depositFrequencyText">-</b></div>
                         <div class="metric"><small>ถอนวันนี้หลังรวมรายการนี้</small><b id="todayWithdrawTotalText">-</b></div>
                         <div class="metric"><small>ถอนเดือนนี้หลังรวมรายการนี้</small><b id="monthWithdrawTotalText">-</b></div>
                         <div class="metric"><small>กำไรเดือนนี้หลังรายการนี้</small><b id="profitMonthText">-</b></div>
@@ -445,7 +483,7 @@ li{margin:8px 0;line-height:1.45}
                 <div class="rules">
                     <b>เกณฑ์ผลลัพธ์:</b><br>
                     ≥ 30 = อนุมัติถอน · 10-29 = ส่งตรวจสอบ · ต่ำกว่า 10 = ไม่อนุมัติถอน<br>
-                    <b>หมายเหตุ:</b> เครดิตคงเหลือคือยอดหลังหักยอดถอนล่าสุดแล้ว ไม่ใช้เป็นเพดานห้ามถอน · ช่องยอดถอนรวมวันนี้/เดือนนี้ให้กรอกยอดก่อนรายการนี้ ระบบจะบวกยอดถอนที่ต้องการให้อัตโนมัติ
+                    <b>หมายเหตุ:</b> เครดิตคงเหลือคือยอดหลังหักยอดถอนล่าสุดแล้ว ไม่ใช้เป็นเพดานห้ามถอน · ช่องยอดถอนรวมวันนี้/เดือนนี้ให้กรอกยอดก่อนรายการนี้ ระบบจะบวกยอดถอนที่ต้องการให้อัตโนมัติ · จำนวนวันฝากเดือนนี้เทียบกับวันที่ปัจจุบันแบบ Real-time
                 </div>
             </div>
         </aside>
@@ -467,6 +505,27 @@ function getUserAge(firstDepositDate){
     return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
+function getCurrentDayOfMonth(){
+    return new Date().getDate();
+}
+
+function updateClock(){
+    const now = new Date();
+    const dateText = now.toLocaleDateString("th-TH", {
+        weekday:"long",
+        year:"numeric",
+        month:"long",
+        day:"numeric"
+    });
+    const timeText = now.toLocaleTimeString("th-TH", {
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit"
+    });
+    document.getElementById("liveDate").innerText = dateText;
+    document.getElementById("liveTime").innerText = "เวลา " + timeText;
+}
+
 function calculate(){
     const userPart = document.getElementById("username").value.replace(/\D/g, "");
     document.getElementById("username").value = userPart;
@@ -485,6 +544,10 @@ function calculate(){
     const monthDeposit = num("monthDeposit");
     const monthWithdrawBefore = num("monthWithdraw");
     const monthWithdrawTotal = monthWithdrawBefore + withdraw;
+    const monthDepositDays = Math.max(0, Math.floor(num("monthDepositDays")));
+    const currentMonthDay = getCurrentDayOfMonth();
+    const validDepositDays = Math.min(monthDepositDays, currentMonthDay);
+    const depositFrequency = currentMonthDay > 0 ? (validDepositDays / currentMonthDay) * 100 : 0;
     const prevDeposit = num("prevDeposit");
     const prevWithdraw = num("prevWithdraw");
 
@@ -536,6 +599,26 @@ function calculate(){
     }else if(todayBills >= 4){
         score += 10;
         reasons.push("จำนวนบิลฝากวันนี้ตั้งแต่ 4 บิลขึ้นไป (+10)");
+    }
+
+    // จำนวนวันฝากเดือนนี้ เทียบกับวันที่ปัจจุบัน
+    if(monthDepositDays > currentMonthDay){
+        reasons.push("จำนวนวันฝากเดือนนี้มากกว่าวันที่ปัจจุบัน ระบบนับสูงสุดที่ " + currentMonthDay + " วัน");
+    }
+
+    let frequencyScore = 0;
+    if(depositFrequency >= 60){
+        frequencyScore = currentMonthDay < 5 ? 8 : 15;
+        score += frequencyScore;
+        reasons.push("ฝากเดือนนี้ " + validDepositDays + " จาก " + currentMonthDay + " วัน (" + depositFrequency.toFixed(0) + "%) ลูกค้าเล่นต่อเนื่อง (+" + frequencyScore + ")");
+    }else if(depositFrequency >= 40){
+        score += 8;
+        reasons.push("ฝากเดือนนี้ " + validDepositDays + " จาก " + currentMonthDay + " วัน (" + depositFrequency.toFixed(0) + "%) ความถี่ปานกลาง (+8)");
+    }else if(depositFrequency >= 20){
+        reasons.push("ฝากเดือนนี้ " + validDepositDays + " จาก " + currentMonthDay + " วัน (" + depositFrequency.toFixed(0) + "%) ความถี่พอใช้ (0)");
+    }else{
+        score -= 10;
+        reasons.push("ฝากเดือนนี้ " + validDepositDays + " จาก " + currentMonthDay + " วัน (" + depositFrequency.toFixed(0) + "%) ความถี่ต่ำ (-10)");
     }
 
     // กำไร/ขาดทุนเดือนนี้ ปรับใหม่
@@ -626,6 +709,7 @@ function calculate(){
     document.getElementById("customerType").innerText = customerType;
     document.getElementById("score").innerText = score;
     document.getElementById("userAgeText").innerText = userAge + " วัน";
+    document.getElementById("depositFrequencyText").innerText = validDepositDays + "/" + currentMonthDay + " วัน (" + depositFrequency.toFixed(0) + "%)";
     document.getElementById("todayWithdrawTotalText").innerText = todayWithdrawTotal.toLocaleString("th-TH");
     document.getElementById("monthWithdrawTotalText").innerText = monthWithdrawTotal.toLocaleString("th-TH");
     document.getElementById("profitMonthText").innerText = profitMonth.toLocaleString("th-TH");
@@ -645,6 +729,7 @@ function resetForm(){
     document.getElementById("customerType").innerText = "-";
     document.getElementById("score").innerText = "-";
     document.getElementById("userAgeText").innerText = "-";
+    document.getElementById("depositFrequencyText").innerText = "-";
     document.getElementById("todayWithdrawTotalText").innerText = "-";
     document.getElementById("monthWithdrawTotalText").innerText = "-";
     document.getElementById("profitMonthText").innerText = "-";
@@ -674,6 +759,8 @@ document.getElementById("username").addEventListener("input", function(){
 });
 
 window.addEventListener("load", () => {
+    updateClock();
+    setInterval(updateClock, 1000);
     document.getElementById("username").focus();
 });
 </script>
