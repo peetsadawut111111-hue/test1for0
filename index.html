@@ -371,7 +371,7 @@ li{margin:8px 0;line-height:1.45}
                             <input id="todayDeposit" class="nav-input" type="number" min="0" placeholder="0" />
                         </div>
                         <div class="field">
-                            <label>ยอดถอนรวมวันนี้</label>
+                            <label>ยอดถอนรวมวันนี้ (ก่อนรายการนี้)</label>
                             <input id="todayWithdraw" class="nav-input" type="number" min="0" placeholder="0" />
                         </div>
                         <div class="field">
@@ -389,7 +389,7 @@ li{margin:8px 0;line-height:1.45}
                             <input id="monthDeposit" class="nav-input" type="number" min="0" placeholder="0" />
                         </div>
                         <div class="field">
-                            <label>ยอดถอนรวมเดือนนี้</label>
+                            <label>ยอดถอนรวมเดือนนี้ (ก่อนรายการนี้)</label>
                             <input id="monthWithdraw" class="nav-input" type="number" min="0" placeholder="0" />
                         </div>
                     </div>
@@ -430,6 +430,9 @@ li{margin:8px 0;line-height:1.45}
                         <div class="metric"><small>ประเภทลูกค้า</small><b id="customerType">-</b></div>
                         <div class="metric"><small>คะแนนรวม</small><b id="score">-</b></div>
                         <div class="metric"><small>อายุยูส</small><b id="userAgeText">-</b></div>
+                        <div class="metric"><small>ถอนวันนี้หลังรวมรายการนี้</small><b id="todayWithdrawTotalText">-</b></div>
+                        <div class="metric"><small>ถอนเดือนนี้หลังรวมรายการนี้</small><b id="monthWithdrawTotalText">-</b></div>
+                        <div class="metric"><small>กำไรเดือนนี้หลังรายการนี้</small><b id="profitMonthText">-</b></div>
                     </div>
                 </div>
 
@@ -442,7 +445,7 @@ li{margin:8px 0;line-height:1.45}
                 <div class="rules">
                     <b>เกณฑ์ผลลัพธ์:</b><br>
                     ≥ 30 = อนุมัติถอน · 10-29 = ส่งตรวจสอบ · ต่ำกว่า 10 = ไม่อนุมัติถอน<br>
-                    <b>หมายเหตุ:</b> เครดิตคงเหลือคือยอดหลังหักยอดถอนล่าสุดแล้ว ไม่ใช้เป็นเพดานห้ามถอน
+                    <b>หมายเหตุ:</b> เครดิตคงเหลือคือยอดหลังหักยอดถอนล่าสุดแล้ว ไม่ใช้เป็นเพดานห้ามถอน · ช่องยอดถอนรวมวันนี้/เดือนนี้ให้กรอกยอดก่อนรายการนี้ ระบบจะบวกยอดถอนที่ต้องการให้อัตโนมัติ
                 </div>
             </div>
         </aside>
@@ -476,15 +479,20 @@ function calculate(){
     const withdraw = num("withdraw");
     const creditRemain = num("creditRemain");
     const todayDeposit = num("todayDeposit");
-    const todayWithdraw = num("todayWithdraw");
+    const todayWithdrawBefore = num("todayWithdraw");
+    const todayWithdrawTotal = todayWithdrawBefore + withdraw;
     const todayBills = num("todayBills");
     const monthDeposit = num("monthDeposit");
-    const monthWithdraw = num("monthWithdraw");
+    const monthWithdrawBefore = num("monthWithdraw");
+    const monthWithdrawTotal = monthWithdrawBefore + withdraw;
     const prevDeposit = num("prevDeposit");
     const prevWithdraw = num("prevWithdraw");
 
     let score = 0;
     let reasons = [];
+
+    reasons.push("ยอดถอนรวมวันนี้หลังรวมรายการนี้ = " + todayWithdrawTotal.toLocaleString("th-TH"));
+    reasons.push("ยอดถอนรวมเดือนนี้หลังรวมรายการนี้ = " + monthWithdrawTotal.toLocaleString("th-TH"));
 
     const customerType = prevDeposit >= 35000 ? "ลูกค้าประจำ" : "ลูกค้าทั่วไป";
 
@@ -531,7 +539,7 @@ function calculate(){
     }
 
     // กำไร/ขาดทุนเดือนนี้ ปรับใหม่
-    const profitMonth = monthDeposit - monthWithdraw;
+    const profitMonth = monthDeposit - monthWithdrawTotal;
     if(profitMonth > 0){
         score += 20;
         reasons.push("เดือนนี้ยอดฝากมากกว่ายอดถอน (+20)");
@@ -618,6 +626,9 @@ function calculate(){
     document.getElementById("customerType").innerText = customerType;
     document.getElementById("score").innerText = score;
     document.getElementById("userAgeText").innerText = userAge + " วัน";
+    document.getElementById("todayWithdrawTotalText").innerText = todayWithdrawTotal.toLocaleString("th-TH");
+    document.getElementById("monthWithdrawTotalText").innerText = monthWithdrawTotal.toLocaleString("th-TH");
+    document.getElementById("profitMonthText").innerText = profitMonth.toLocaleString("th-TH");
 
     document.getElementById("emptyReason").style.display = "none";
     const reasonList = document.getElementById("reason");
@@ -634,6 +645,9 @@ function resetForm(){
     document.getElementById("customerType").innerText = "-";
     document.getElementById("score").innerText = "-";
     document.getElementById("userAgeText").innerText = "-";
+    document.getElementById("todayWithdrawTotalText").innerText = "-";
+    document.getElementById("monthWithdrawTotalText").innerText = "-";
+    document.getElementById("profitMonthText").innerText = "-";
     document.getElementById("reason").innerHTML = "";
     document.getElementById("reason").style.display = "none";
     document.getElementById("emptyReason").style.display = "block";
