@@ -190,7 +190,7 @@ h1{
     margin-bottom:8px;
     font-weight:700;
 }
-input{
+input, select, textarea{
     width:100%;
     height:46px;
     padding:0 13px;
@@ -202,11 +202,14 @@ input{
     font-size:15px;
     transition:.18s ease;
 }
-input:focus{
+input:focus, select:focus, textarea:focus{
     border-color:var(--gold-2);
     box-shadow:0 0 0 4px rgba(212,175,55,.16);
 }
-input::placeholder{color:#6b7280}
+input::placeholder, textarea::placeholder{color:#6b7280}
+select{appearance:none}
+textarea{height:92px; padding:12px 13px; resize:vertical; line-height:1.45; font-family:Tahoma,Arial,sans-serif}
+.field.full{grid-column:1 / -1}
 .username-wrap{
     display:flex;
     align-items:center;
@@ -228,7 +231,7 @@ input::placeholder{color:#6b7280}
 .username-wrap input{border-radius:0 13px 13px 0}
 .actions{
     display:grid;
-    grid-template-columns:1fr 190px;
+    grid-template-columns:1fr 190px 190px;
     gap:12px;
     margin-top:14px;
 }
@@ -316,6 +319,42 @@ li{margin:8px 0;line-height:1.45}
     line-height:1.65;
 }
 .rules b{color:var(--gold-2)}
+
+.sheet-config{
+    margin-top:14px;
+    padding:14px;
+    border-radius:18px;
+    background:#0a0a0a;
+    border:1px solid rgba(212,175,55,.15);
+}
+.sheet-config label{
+    display:block;
+    font-size:13px;
+    color:#e5e5e5;
+    margin-bottom:8px;
+    font-weight:700;
+}
+.sheet-row{
+    display:grid;
+    grid-template-columns:1fr 120px;
+    gap:10px;
+}
+.save-status{
+    margin-top:10px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.5;
+}
+.btn-save{
+    background:linear-gradient(135deg,#166534,#22c55e,#166534);
+    color:#06130a;
+    box-shadow:0 10px 30px rgba(34,197,94,.12);
+}
+.btn-save:hover{transform:translateY(-1px);filter:brightness(1.06)}
+@media(max-width:680px){
+    .sheet-row{grid-template-columns:1fr}
+}
+
 @media(max-width:1100px){
     .layout{grid-template-columns:1fr}
     .result-panel{position:static}
@@ -446,8 +485,52 @@ li{margin:8px 0;line-height:1.45}
                     </div>
                 </div>
 
+                <div class="section">
+                    <div class="section-title"><span class="dot"></span>ผลจากแอดมิน / ข้อมูลสำหรับเรียนรู้</div>
+                    <div class="grid">
+                        <div class="field">
+                            <label>ผลการตัดสินของแอดมิน</label>
+                            <select id="adminDecision" class="nav-input">
+                                <option value="">-- เลือกผลแอดมิน --</option>
+                                <option value="อนุมัติถอน">อนุมัติถอน</option>
+                                <option value="ส่งตรวจสอบ">ส่งตรวจสอบ</option>
+                                <option value="ไม่อนุมัติถอน">ไม่อนุมัติถอน</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>เหตุผลแอดมิน</label>
+                            <select id="adminReason" class="nav-input">
+                                <option value="">-- เลือกเหตุผล --</option>
+                                <option value="ลูกค้าประจำ">ลูกค้าประจำ</option>
+                                <option value="ประวัติดี">ประวัติดี</option>
+                                <option value="KYC ผ่านแล้ว">KYC ผ่านแล้ว</option>
+                                <option value="ยูสใหม่">ยูสใหม่</option>
+                                <option value="ยอดถอนสูงผิดปกติ">ยอดถอนสูงผิดปกติ</option>
+                                <option value="พฤติกรรมเสี่ยง">พฤติกรรมเสี่ยง</option>
+                                <option value="รอตรวจสอบเพิ่ม">รอตรวจสอบเพิ่ม</option>
+                                <option value="อื่นๆ">อื่นๆ</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>ผลจริงภายหลัง</label>
+                            <select id="finalResult" class="nav-input">
+                                <option value="">-- ยังไม่ทราบผล --</option>
+                                <option value="ปกติ">ปกติ</option>
+                                <option value="ลูกค้าดี">ลูกค้าดี</option>
+                                <option value="เฝ้าระวัง">เฝ้าระวัง</option>
+                                <option value="มีปัญหา">มีปัญหา</option>
+                                <option value="โกง">โกง</option>
+                            </select>
+                        </div>
+                        <div class="field full">
+                            <label>หมายเหตุแอดมิน</label>
+                            <textarea id="adminNote" placeholder="พิมพ์รายละเอียดเพิ่มเติม เช่น ตรวจประวัติแล้ว, ลูกค้าประจำ, ยอดถอนสูงแต่มีประวัติดี"></textarea>
+                        </div>
+                    </div>
+                </div>
                 <div class="actions">
                     <button class="btn-primary" onclick="calculate()">คำนวณผล</button>
+                    <button class="btn-save" onclick="saveCaseToSheet()">บันทึกเคส</button>
                     <button class="btn-secondary" onclick="resetForm()">ล้างข้อมูล</button>
                 </div>
             </div>
@@ -483,7 +566,17 @@ li{margin:8px 0;line-height:1.45}
                 <div class="rules">
                     <b>เกณฑ์ผลลัพธ์:</b><br>
                     ≥ 30 = อนุมัติถอน · 10-29 = ส่งตรวจสอบ · ต่ำกว่า 10 = ไม่อนุมัติถอน<br>
-                    <b>หมายเหตุ:</b> เครดิตคงเหลือคือยอดหลังหักยอดถอนล่าสุดแล้ว ไม่ใช้เป็นเพดานห้ามถอน · ช่องยอดถอนรวมวันนี้/เดือนนี้ให้กรอกยอดก่อนรายการนี้ ระบบจะบวกยอดถอนที่ต้องการให้อัตโนมัติ · จำนวนวันฝากเดือนนี้เทียบกับวันที่ปัจจุบันแบบ Real-time
+                    <b>หมายเหตุ:</b> เครดิตคงเหลือคือยอดหลังหักยอดถอนล่าสุดแล้ว ไม่ใช้เป็นเพดานห้ามถอน · ช่องยอดถอนรวมวันนี้/เดือนนี้ให้กรอกยอดก่อนรายการนี้ ระบบจะบวกยอดถอนที่ต้องการให้อัตโนมัติ · จำนวนวันฝากเดือนนี้เทียบกับวันที่ปัจจุบันแบบ Real-time<br>
+                    <b>Google Sheet:</b> กดคำนวณก่อน เลือกผลแอดมิน แล้วกดบันทึกเคสเพื่อส่งข้อมูลเข้า Sheet
+                </div>
+
+                <div class="sheet-config">
+                    <label>Google Apps Script Web App URL</label>
+                    <div class="sheet-row">
+                        <input id="webAppUrl" type="url" placeholder="วางลิงก์ Web App URL ที่ Deploy จาก Apps Script" autocomplete="off" />
+                        <button class="btn-secondary" onclick="saveWebAppUrl()">จำลิงก์</button>
+                    </div>
+                    <div id="saveStatus" class="save-status">ยังไม่ได้เชื่อม Google Sheet</div>
                 </div>
             </div>
         </aside>
@@ -491,6 +584,8 @@ li{margin:8px 0;line-height:1.45}
 </div>
 
 <script>
+let lastCalculatedCase = null;
+
 function num(id){
     return Number(document.getElementById(id).value || 0);
 }
@@ -550,6 +645,7 @@ function calculate(){
     const depositFrequency = currentMonthDay > 0 ? (validDepositDays / currentMonthDay) * 100 : 0;
     const prevDeposit = num("prevDeposit");
     const prevWithdraw = num("prevWithdraw");
+    const adminFeedback = getAdminFeedback();
 
     let score = 0;
     let reasons = [];
@@ -714,14 +810,123 @@ function calculate(){
     document.getElementById("monthWithdrawTotalText").innerText = monthWithdrawTotal.toLocaleString("th-TH");
     document.getElementById("profitMonthText").innerText = profitMonth.toLocaleString("th-TH");
 
+    lastCalculatedCase = {
+        savedAt: new Date().toISOString(),
+        savedAtThai: new Date().toLocaleString("th-TH"),
+        username,
+        firstDepositDate,
+        userAge,
+        customerType,
+        lastDeposit,
+        withdraw,
+        creditRemain,
+        todayDeposit,
+        todayWithdrawBefore,
+        todayWithdrawTotal,
+        todayBills,
+        monthDeposit,
+        monthWithdrawBefore,
+        monthWithdrawTotal,
+        monthDepositDays: validDepositDays,
+        currentMonthDay,
+        depositFrequency: Number(depositFrequency.toFixed(2)),
+        prevDeposit,
+        prevWithdraw,
+        profitMonth,
+        profitPrev,
+        score,
+        decision: decisionText,
+        adminDecision: adminFeedback.adminDecision,
+        adminReason: adminFeedback.adminReason,
+        adminNote: adminFeedback.adminNote,
+        finalResult: adminFeedback.finalResult,
+        reasons
+    };
+
     document.getElementById("emptyReason").style.display = "none";
     const reasonList = document.getElementById("reason");
     reasonList.style.display = "block";
     reasonList.innerHTML = reasons.map(r => `<li>${r}</li>`).join("");
 }
 
+
+function getAdminFeedback(){
+    return {
+        adminDecision: document.getElementById("adminDecision") ? document.getElementById("adminDecision").value : "",
+        adminReason: document.getElementById("adminReason") ? document.getElementById("adminReason").value : "",
+        adminNote: document.getElementById("adminNote") ? document.getElementById("adminNote").value.trim() : "",
+        finalResult: document.getElementById("finalResult") ? document.getElementById("finalResult").value : ""
+    };
+}
+
+function applyAdminFeedbackToLastCase(){
+    if(!lastCalculatedCase) return;
+    const feedback = getAdminFeedback();
+    lastCalculatedCase.adminDecision = feedback.adminDecision;
+    lastCalculatedCase.adminReason = feedback.adminReason;
+    lastCalculatedCase.adminNote = feedback.adminNote;
+    lastCalculatedCase.finalResult = feedback.finalResult;
+}
+
+function saveWebAppUrl(){
+    const url = document.getElementById("webAppUrl").value.trim();
+    const status = document.getElementById("saveStatus");
+    if(!url){
+        status.innerText = "กรุณาวาง Web App URL ก่อน";
+        return;
+    }
+    localStorage.setItem("frtDashboardWebAppUrl", url);
+    status.innerText = "จำลิงก์ Google Sheet แล้ว";
+}
+
+async function saveCaseToSheet(){
+    const status = document.getElementById("saveStatus");
+    const url = document.getElementById("webAppUrl").value.trim() || localStorage.getItem("frtDashboardWebAppUrl") || "";
+
+    if(!url){
+        status.innerText = "ยังไม่ได้ใส่ Web App URL: ให้ Deploy Apps Script แล้วนำลิงก์มาวางก่อน";
+        return;
+    }
+
+    if(!lastCalculatedCase){
+        calculate();
+    }
+
+    if(!lastCalculatedCase){
+        status.innerText = "ยังไม่มีข้อมูลเคสสำหรับบันทึก";
+        return;
+    }
+
+    applyAdminFeedbackToLastCase();
+    if(!lastCalculatedCase.adminDecision){
+        status.innerText = "กรุณาเลือกผลการตัดสินของแอดมินก่อนบันทึกเคส";
+        document.getElementById("adminDecision").focus();
+        return;
+    }
+
+    localStorage.setItem("frtDashboardWebAppUrl", url);
+    status.innerText = "กำลังส่งข้อมูลเข้า Google Sheet...";
+
+    try{
+        await fetch(url, {
+            method:"POST",
+            mode:"no-cors",
+            headers:{"Content-Type":"text/plain;charset=utf-8"},
+            body:JSON.stringify(lastCalculatedCase)
+        });
+        status.innerText = "ส่งข้อมูลแล้ว: กรุณาตรวจใน Google Sheet เพื่อยืนยัน เพราะ Web App ใช้โหมด no-cors";
+    }catch(error){
+        status.innerText = "บันทึกไม่สำเร็จ: " + error.message;
+    }
+}
+
 function resetForm(){
+    const savedUrl = document.getElementById("webAppUrl").value;
     document.querySelectorAll("input").forEach(input => input.value = "");
+    document.querySelectorAll("select").forEach(select => select.value = "");
+    document.querySelectorAll("textarea").forEach(textarea => textarea.value = "");
+    document.getElementById("webAppUrl").value = savedUrl;
+    lastCalculatedCase = null;
     const decision = document.getElementById("decision");
     decision.innerText = "รอคำนวณ";
     decision.className = "decision review";
@@ -759,6 +964,11 @@ document.getElementById("username").addEventListener("input", function(){
 });
 
 window.addEventListener("load", () => {
+    const savedWebAppUrl = localStorage.getItem("frtDashboardWebAppUrl");
+    if(savedWebAppUrl){
+        document.getElementById("webAppUrl").value = savedWebAppUrl;
+        document.getElementById("saveStatus").innerText = "พบลิงก์ Google Sheet ที่บันทึกไว้แล้ว";
+    }
     updateClock();
     setInterval(updateClock, 1000);
     document.getElementById("username").focus();
