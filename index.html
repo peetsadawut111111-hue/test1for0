@@ -554,6 +554,7 @@ li{margin:8px 0;line-height:1.45}
                         <div class="metric"><small>ถอนวันนี้หลังรวมรายการนี้</small><b id="todayWithdrawTotalText">-</b></div>
                         <div class="metric"><small>ถอนเดือนนี้หลังรวมรายการนี้</small><b id="monthWithdrawTotalText">-</b></div>
                         <div class="metric"><small>กำไรเดือนนี้หลังรายการนี้</small><b id="profitMonthText">-</b></div>
+                        <div class="metric"><small>กำไรรวม 2 เดือน</small><b id="profitTwoMonthText">-</b></div>
                     </div>
                 </div>
 
@@ -566,17 +567,17 @@ li{margin:8px 0;line-height:1.45}
                 <div class="rules">
                     <b>เกณฑ์ผลลัพธ์:</b><br>
                     ≥ 30 = อนุมัติถอน · 10-29 = ส่งตรวจสอบ · ต่ำกว่า 10 = ไม่อนุมัติถอน<br>
-                    <b>หมายเหตุ:</b> เครดิตคงเหลือคือยอดหลังหักยอดถอนล่าสุดแล้ว ไม่ใช้เป็นเพดานห้ามถอน · ช่องยอดถอนรวมวันนี้/เดือนนี้ให้กรอกยอดก่อนรายการนี้ ระบบจะบวกยอดถอนที่ต้องการให้อัตโนมัติ · จำนวนวันฝากเดือนนี้เทียบกับวันที่ปัจจุบันแบบ Real-time<br>
+                    <b>หมายเหตุ:</b> เครดิตคงเหลือคือยอดหลังหักยอดถอนล่าสุดแล้ว ไม่ใช้เป็นเพดานห้ามถอน · ช่องยอดถอนรวมวันนี้/เดือนนี้ให้กรอกยอดก่อนรายการนี้ ระบบจะบวกยอดถอนที่ต้องการให้อัตโนมัติ · จำนวนวันฝากเดือนนี้เทียบกับวันที่ปัจจุบันแบบ Real-time · ระบบนำกำไรเดือนนี้ + เดือนก่อนมาช่วยตัดสินใจด้วย<br>
                     <b>Google Sheet:</b> กดคำนวณก่อน เลือกผลแอดมิน แล้วกดบันทึกเคสเพื่อส่งข้อมูลเข้า Sheet
                 </div>
 
                 <div class="sheet-config">
                     <label>Google Apps Script Web App URL</label>
                     <div class="sheet-row">
-                        <input id="webAppUrl" type="url" placeholder="วางลิงก์ Web App URL ที่ Deploy จาก Apps Script" autocomplete="off" />
-                        <button class="btn-secondary" onclick="saveWebAppUrl()">จำลิงก์</button>
+                        <input id="webAppUrl" type="url" value="https://script.google.com/macros/s/AKfycbzDrBnH9_lF0K1AUMa87Mq_a8gF6i_fX6MXIHSZSWiqOOO6wdAnGEv_eOAYaCRkykuM0g/exec" readonly autocomplete="off" />
+                        <button class="btn-secondary" onclick="saveWebAppUrl()">ลิงก์ถูกล็อก</button>
                     </div>
-                    <div id="saveStatus" class="save-status">ยังไม่ได้เชื่อม Google Sheet</div>
+                    <div id="saveStatus" class="save-status">เชื่อม Google Sheet กลางไว้แล้ว</div>
                 </div>
             </div>
         </aside>
@@ -585,6 +586,7 @@ li{margin:8px 0;line-height:1.45}
 
 <script>
 let lastCalculatedCase = null;
+const FIXED_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzDrBnH9_lF0K1AUMa87Mq_a8gF6i_fX6MXIHSZSWiqOOO6wdAnGEv_eOAYaCRkykuM0g/exec";
 
 function num(id){
     return Number(document.getElementById(id).value || 0);
@@ -760,6 +762,30 @@ function calculate(){
         }
     }
 
+    // กำไรรวม 2 เดือน: เดือนนี้หลังรวมรายการนี้ + เดือนก่อน
+    const profitTwoMonth = profitMonth + profitPrev;
+    if(profitTwoMonth > 50000){
+        score += 30;
+        reasons.push("กำไรรวม 2 เดือนมากกว่า 50,000 (+30)");
+    }else if(profitTwoMonth >= 20000){
+        score += 20;
+        reasons.push("กำไรรวม 2 เดือน 20,000-50,000 (+20)");
+    }else if(profitTwoMonth >= 5000){
+        score += 10;
+        reasons.push("กำไรรวม 2 เดือน 5,000-19,999 (+10)");
+    }else if(profitTwoMonth >= 0){
+        reasons.push("กำไรรวม 2 เดือน 0-4,999 ถือว่ากลาง ๆ (0)");
+    }else if(profitTwoMonth >= -20000){
+        score -= 10;
+        reasons.push("กำไรรวม 2 เดือนติดลบไม่เกิน 20,000 (-10)");
+    }else if(profitTwoMonth >= -50000){
+        score -= 20;
+        reasons.push("กำไรรวม 2 เดือนติดลบ 20,001-50,000 (-20)");
+    }else{
+        score -= 30;
+        reasons.push("กำไรรวม 2 เดือนติดลบเกิน 50,000 (-30)");
+    }
+
     // อายุยูส
     if(userAge < 7){
         score -= 20;
@@ -786,6 +812,10 @@ function calculate(){
         decisionText = "❌ ไม่อนุมัติถอน";
         decisionClass = "reject";
         reasons.push("เข้าเงื่อนไข Red Flag: ฝากล่าสุด <100, ถอน >=5,000, ฝากเดือนนี้ <1,000, และไม่ใช่ลูกค้าประจำ");
+    }else if(profitTwoMonth < -50000 && withdraw >= 10000){
+        decisionText = "⚠️ ส่งตรวจสอบ";
+        decisionClass = "review";
+        reasons.push("กำไรรวม 2 เดือนติดลบเกิน 50,000 และยอดถอนตั้งแต่ 10,000 ขึ้นไป: ส่งตรวจสอบก่อนอนุมัติ");
     }else if(score >= 30){
         decisionText = "✅ อนุมัติถอน";
         decisionClass = "approve";
@@ -809,6 +839,7 @@ function calculate(){
     document.getElementById("todayWithdrawTotalText").innerText = todayWithdrawTotal.toLocaleString("th-TH");
     document.getElementById("monthWithdrawTotalText").innerText = monthWithdrawTotal.toLocaleString("th-TH");
     document.getElementById("profitMonthText").innerText = profitMonth.toLocaleString("th-TH");
+    document.getElementById("profitTwoMonthText").innerText = profitTwoMonth.toLocaleString("th-TH");
 
     lastCalculatedCase = {
         savedAt: new Date().toISOString(),
@@ -834,6 +865,7 @@ function calculate(){
         prevWithdraw,
         profitMonth,
         profitPrev,
+        profitTwoMonth,
         score,
         decision: decisionText,
         adminDecision: adminFeedback.adminDecision,
@@ -869,19 +901,15 @@ function applyAdminFeedbackToLastCase(){
 }
 
 function saveWebAppUrl(){
-    const url = document.getElementById("webAppUrl").value.trim();
     const status = document.getElementById("saveStatus");
-    if(!url){
-        status.innerText = "กรุณาวาง Web App URL ก่อน";
-        return;
-    }
-    localStorage.setItem("frtDashboardWebAppUrl", url);
-    status.innerText = "จำลิงก์ Google Sheet แล้ว";
+    document.getElementById("webAppUrl").value = FIXED_WEB_APP_URL;
+    localStorage.setItem("frtDashboardWebAppUrl", FIXED_WEB_APP_URL);
+    status.innerText = "ลิงก์ Google Sheet กลางถูกล็อกไว้แล้ว";
 }
 
 async function saveCaseToSheet(){
     const status = document.getElementById("saveStatus");
-    const url = document.getElementById("webAppUrl").value.trim() || localStorage.getItem("frtDashboardWebAppUrl") || "";
+    const url = FIXED_WEB_APP_URL;
 
     if(!url){
         status.innerText = "ยังไม่ได้ใส่ Web App URL: ให้ Deploy Apps Script แล้วนำลิงก์มาวางก่อน";
@@ -921,7 +949,7 @@ async function saveCaseToSheet(){
 }
 
 function resetForm(){
-    const savedUrl = document.getElementById("webAppUrl").value;
+    const savedUrl = FIXED_WEB_APP_URL;
     document.querySelectorAll("input").forEach(input => input.value = "");
     document.querySelectorAll("select").forEach(select => select.value = "");
     document.querySelectorAll("textarea").forEach(textarea => textarea.value = "");
@@ -938,6 +966,7 @@ function resetForm(){
     document.getElementById("todayWithdrawTotalText").innerText = "-";
     document.getElementById("monthWithdrawTotalText").innerText = "-";
     document.getElementById("profitMonthText").innerText = "-";
+    document.getElementById("profitTwoMonthText").innerText = "-";
     document.getElementById("reason").innerHTML = "";
     document.getElementById("reason").style.display = "none";
     document.getElementById("emptyReason").style.display = "block";
@@ -964,11 +993,9 @@ document.getElementById("username").addEventListener("input", function(){
 });
 
 window.addEventListener("load", () => {
-    const savedWebAppUrl = localStorage.getItem("frtDashboardWebAppUrl");
-    if(savedWebAppUrl){
-        document.getElementById("webAppUrl").value = savedWebAppUrl;
-        document.getElementById("saveStatus").innerText = "พบลิงก์ Google Sheet ที่บันทึกไว้แล้ว";
-    }
+    document.getElementById("webAppUrl").value = FIXED_WEB_APP_URL;
+    localStorage.setItem("frtDashboardWebAppUrl", FIXED_WEB_APP_URL);
+    document.getElementById("saveStatus").innerText = "ใช้ Google Sheet กลางที่ล็อกไว้แล้ว";
     updateClock();
     setInterval(updateClock, 1000);
     document.getElementById("username").focus();
