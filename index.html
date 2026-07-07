@@ -1005,7 +1005,8 @@ window.addEventListener("load", () => {
     setInterval(updateClock, 1000);
     document.getElementById("username").focus();
 });
-    async function analyzeAI(){
+    function analyzeAI(){
+
     if(!lastCalculatedCase){
         calculate();
     }
@@ -1018,13 +1019,9 @@ window.addEventListener("load", () => {
     const aiBox = document.getElementById("aiResult");
     aiBox.innerText = "AI กำลังวิเคราะห์...";
 
-    const url = FIXED_WEB_APP_URL
-        + "?action=ai&data="
-        + encodeURIComponent(JSON.stringify(lastCalculatedCase));
+    const callbackName = "aiCallback_" + Date.now();
 
-    try{
-        const res = await fetch(url);
-        const json = await res.json();
+    window[callbackName] = function(json){
 
         if(json.ok){
             aiBox.innerText = json.ai;
@@ -1033,9 +1030,26 @@ window.addEventListener("load", () => {
             aiBox.innerText = "AI วิเคราะห์ไม่สำเร็จ";
         }
 
-    }catch(err){
-        aiBox.innerText = "AI Error: " + err.message;
-    }
+        delete window[callbackName];
+        script.remove();
+    };
+
+    const script = document.createElement("script");
+
+    script.src =
+        FIXED_WEB_APP_URL +
+        "?action=ai" +
+        "&callback=" + callbackName +
+        "&data=" + encodeURIComponent(JSON.stringify(lastCalculatedCase));
+
+    script.onerror = function(){
+        aiBox.innerText = "AI Error : โหลด Apps Script ไม่สำเร็จ";
+        delete window[callbackName];
+        script.remove();
+    };
+
+    document.body.appendChild(script);
+}
 }
 </script>
 </body>
