@@ -231,7 +231,7 @@ textarea{height:92px; padding:12px 13px; resize:vertical; line-height:1.45; font
 .username-wrap input{border-radius:0 13px 13px 0}
 .actions{
     display:grid;
-    grid-template-columns:1fr 190px 190px;
+    grid-template-columns:1fr 1fr 190px 190px;
     gap:12px;
     margin-top:14px;
 }
@@ -530,6 +530,7 @@ li{margin:8px 0;line-height:1.45}
                 </div>
                 <div class="actions">
                     <button class="btn-primary" onclick="calculate()">คำนวณผล</button>
+                    <button class="btn-primary" onclick="analyzeAI()">🤖 วิเคราะห์ด้วย AI</button>
                     <button class="btn-save" onclick="saveCaseToSheet()">บันทึกเคส</button>
                     <button class="btn-secondary" onclick="resetForm()">ล้างข้อมูล</button>
                 </div>
@@ -558,6 +559,10 @@ li{margin:8px 0;line-height:1.45}
                     </div>
                 </div>
 
+                <div class="reason-box" style="margin-bottom:14px">
+                        <h3>🤖 วิเคราะห์ด้วย AI</h3>
+                        <div id="aiResult" class="empty">กดปุ่ม “วิเคราะห์ด้วย AI” หลังจากคำนวณผล</div>
+                </div>
                 <div class="reason-box">
                     <h3>เหตุผล</h3>
                     <div id="emptyReason" class="empty">ยังไม่มีผลลัพธ์</div>
@@ -1000,6 +1005,38 @@ window.addEventListener("load", () => {
     setInterval(updateClock, 1000);
     document.getElementById("username").focus();
 });
+    async function analyzeAI(){
+    if(!lastCalculatedCase){
+        calculate();
+    }
+
+    if(!lastCalculatedCase){
+        alert("กรุณากรอกข้อมูลและคำนวณผลก่อน");
+        return;
+    }
+
+    const aiBox = document.getElementById("aiResult");
+    aiBox.innerText = "AI กำลังวิเคราะห์...";
+
+    const url = FIXED_WEB_APP_URL
+        + "?action=ai&data="
+        + encodeURIComponent(JSON.stringify(lastCalculatedCase));
+
+    try{
+        const res = await fetch(url);
+        const json = await res.json();
+
+        if(json.ok){
+            aiBox.innerText = json.ai;
+            lastCalculatedCase.aiAnalysis = json.ai;
+        }else{
+            aiBox.innerText = "AI วิเคราะห์ไม่สำเร็จ";
+        }
+
+    }catch(err){
+        aiBox.innerText = "AI Error: " + err.message;
+    }
+}
 </script>
 </body>
 </html>
