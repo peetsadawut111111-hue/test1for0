@@ -1005,7 +1005,7 @@ window.addEventListener("load", () => {
     setInterval(updateClock, 1000);
     document.getElementById("username").focus();
 });
-    function analyzeAI(){
+   function analyzeAI(){
 
     if(!lastCalculatedCase){
         calculate();
@@ -1020,6 +1020,7 @@ window.addEventListener("load", () => {
     aiBox.innerText = "AI กำลังวิเคราะห์...";
 
     const callbackName = "aiCallback_" + Date.now();
+    const script = document.createElement("script");
 
     window[callbackName] = function(json){
 
@@ -1034,8 +1035,6 @@ window.addEventListener("load", () => {
         script.remove();
     };
 
-    const script = document.createElement("script");
-
     script.src =
         FIXED_WEB_APP_URL +
         "?action=ai" +
@@ -1049,7 +1048,6 @@ window.addEventListener("load", () => {
     };
 
     document.body.appendChild(script);
-}
 }
 </script>
 </body>
