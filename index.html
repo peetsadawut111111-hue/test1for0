@@ -1005,44 +1005,86 @@ window.addEventListener("load", () => {
     setInterval(updateClock, 1000);
     document.getElementById("username").focus();
 });
-   function analyzeAI(){
-
-    if(!lastCalculatedCase){
+  function analyzeAI() {
+    if (!lastCalculatedCase) {
         calculate();
     }
 
-    if(!lastCalculatedCase){
+    if (!lastCalculatedCase) {
         alert("กรุณากรอกข้อมูลและคำนวณผลก่อน");
         return;
     }
 
     const aiBox = document.getElementById("aiResult");
-    aiBox.innerText = "AI กำลังวิเคราะห์...";
+    aiBox.innerText = "AI Agent กำลังค้นประวัติและวิเคราะห์...";
 
-    const callbackName = "aiCallback_" + Date.now();
+    const callbackName = "agentCallback_" + Date.now();
     const script = document.createElement("script");
 
-    window[callbackName] = function(json){
+    window[callbackName] = function(json) {
+        try {
+            if (json.ok && json.agent) {
+                const history = json.history || {};
+                const summary = history.summary || {};
+                const agent = json.agent;
 
-        if(json.ok){
-            aiBox.innerText = json.ai;
-            lastCalculatedCase.aiAnalysis = json.ai;
-        }else{
-            aiBox.innerText = "AI วิเคราะห์ไม่สำเร็จ";
+                const checks = Array.isArray(agent.checks)
+                    ? agent.checks.map(item => "• " + item).join("\n")
+                    : "• ไม่มีรายการตรวจเพิ่มเติม";
+
+                aiBox.innerText =
+`คำแนะนำ Agent:
+${agent.recommendation}
+
+Risk Score:
+${agent.riskScore}/100
+
+Confidence:
+${agent.confidence}%
+
+ประวัติลูกค้า:
+พบทั้งหมด ${history.totalCasesFound || 0} เคส
+นำมาวิเคราะห์ ${history.historyUsed || 0} เคส
+อนุมัติ ${summary.approvedCount || 0} เคส
+ส่งตรวจสอบ ${summary.reviewCount || 0} เคส
+ไม่อนุมัติ ${summary.rejectedCount || 0} เคส
+ผลปกติ/ลูกค้าดี ${summary.normalCount || 0} เคส
+พบปัญหา ${summary.problemCount || 0} เคส
+ถอนเฉลี่ย ${Number(summary.averageWithdraw || 0).toLocaleString("th-TH")} บาท
+ถอนสูงสุด ${Number(summary.maxWithdraw || 0).toLocaleString("th-TH")} บาท
+
+เหตุผล:
+${agent.reason}
+
+สิ่งที่ควรตรวจ:
+${checks}`;
+
+                lastCalculatedCase.aiAnalysis = agent.reason;
+                lastCalculatedCase.agentRecommendation = agent.recommendation;
+                lastCalculatedCase.agentRiskScore = agent.riskScore;
+                lastCalculatedCase.agentConfidence = agent.confidence;
+                lastCalculatedCase.agentChecks = agent.checks;
+                lastCalculatedCase.historyUsed = history.historyUsed || 0;
+
+            } else {
+                aiBox.innerText =
+                    "Agent Error: " + (json.message || "วิเคราะห์ไม่สำเร็จ");
+            }
+        } finally {
+            delete window[callbackName];
+            script.remove();
         }
-
-        delete window[callbackName];
-        script.remove();
     };
 
     script.src =
         FIXED_WEB_APP_URL +
-        "?action=ai" +
-        "&callback=" + callbackName +
-        "&data=" + encodeURIComponent(JSON.stringify(lastCalculatedCase));
+        "?action=agent" +
+        "&callback=" + encodeURIComponent(callbackName) +
+        "&data=" +
+        encodeURIComponent(JSON.stringify(lastCalculatedCase));
 
-    script.onerror = function(){
-        aiBox.innerText = "AI Error : โหลด Apps Script ไม่สำเร็จ";
+    script.onerror = function() {
+        aiBox.innerText = "Agent Error: โหลด Apps Script ไม่สำเร็จ";
         delete window[callbackName];
         script.remove();
     };
